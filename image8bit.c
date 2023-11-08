@@ -172,7 +172,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
-  Image newImage = (Image)malloc(sizeof(Image));
+  Image newImage = (Image)malloc(sizeof(newImage));
   if (newImage == NULL) {
     errCause = "Falha ao alocar memória";
     return NULL;
