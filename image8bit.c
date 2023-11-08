@@ -172,7 +172,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
-  Image newImage = (Image)malloc(sizeof(newImage));
+  Image newImage = (Image)malloc(sizeof(*newImage));
   if (newImage == NULL) {
     errCause = "Falha ao alocar memória";
     return NULL;
@@ -316,6 +316,19 @@ int ImageMaxval(Image img) { ///
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
   // Insert your code here!
+  int min, max;
+  min = 0;
+  max = 1000;
+  for (int i; i < (img->height); i++) {
+    for (int j; j < (img->width); j++) {
+      int currentpixel = ImageGetPixel(img, j, i);
+      if (currentpixel < *min) {
+        *min = currentpixel;
+      } else if (currentpixel > *max) {
+        *max = currentpixel;
+      }
+    }
+  }
 }
 
 /// Check if pixel position (x,y) is inside img.
@@ -343,6 +356,8 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 static inline int G(Image img, int x, int y) {
   int index;
   // Insert your code here!
+  index = y * img->width + x;
+  //
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
