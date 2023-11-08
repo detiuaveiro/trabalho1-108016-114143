@@ -10,7 +10,7 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
+// NMec:108016  Name:Fábio Alves
 // 
 // 
 // 
@@ -172,6 +172,24 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
+  Image newImage = (Image)malloc(sizeof(Image));
+  if (newImage == NULL) {
+    errCause = "Falha ao alocar memória";
+    return NULL;
+  }
+
+  newImage->width = width;
+  newImage->height = height;
+  newImage->maxval = maxval;
+  newImage->pixel = (uint8_t*)calloc(width * height, sizeof(uint8_t));
+
+  if (newImage->pixel == NULL) {
+    errCause = "Falha ao alocar memória";
+    free(newImage);
+    return NULL;
+  }
+  return newImage;
+  
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -182,6 +200,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
+  free((*imgp)->pixel);
+  free(*imgp);
+  imgp = NULL;
+  
 }
 
 
