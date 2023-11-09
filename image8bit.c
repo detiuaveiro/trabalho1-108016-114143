@@ -391,8 +391,22 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// This transforms dark pixels to light pixels and vice-versa,
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
-  assert (img != NULL);
+  assert (img != NULL);  
   // Insert your code here!
+  int invlevel;
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      int currentpixel = ImageGetPixel(img, j, i);
+      if (currentpixel < 128) {
+        invlevel = 128 - currentpixel;
+      } else if (currentpixel > 128) {
+        invlevel = currentpixel - 128;       
+      } else {
+        invlevel = currentpixel;
+      }
+      ImageSetPixel(img, j, i, invlevel);
+    }
+  }
 }
 
 /// Apply threshold to image.
