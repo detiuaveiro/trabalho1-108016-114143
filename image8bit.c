@@ -316,8 +316,8 @@ int ImageMaxval(Image img) { ///
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
   // Insert your code here!
-  for (int i; i < (img->height); i++) {
-    for (int j; j < (img->width); j++) {
+  for (int i  = 0; i < (img->height); i++) {
+    for (int j = 0; j < (img->width); j++) {
       int currentpixel = ImageGetPixel(img, j, i);
       if (currentpixel < *min) {
         *min = currentpixel;
@@ -390,17 +390,11 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);  
   // Insert your code here!
-  int invlevel;
+  uint8 invlevel;
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
       int currentpixel = ImageGetPixel(img, j, i);
-      if (currentpixel < 128) {
-        invlevel = 128 - currentpixel;
-      } else if (currentpixel > 128) {
-        invlevel = currentpixel - 128;       
-      } else {
-        invlevel = currentpixel;
-      }
+      invlevel = (int)((255 - currentpixel)+0.5);
       ImageSetPixel(img, j, i, invlevel);
     }
   }
@@ -412,6 +406,19 @@ void ImageNegative(Image img) { ///
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
+  uint8 thrlevel;
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      int currentpixel = ImageGetPixel(img, j, i);
+      if (currentpixel<thr){
+        thrlevel=0;
+      }
+      else{
+        thrlevel=255;
+      }
+      ImageSetPixel(img, j, i, thrlevel);
+    }
+  }
 }
 
 /// Brighten image by a factor.
