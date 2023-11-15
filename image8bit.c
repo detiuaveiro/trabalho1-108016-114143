@@ -316,9 +316,6 @@ int ImageMaxval(Image img) { ///
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
   // Insert your code here!
-  int min, max;
-  min = 0;
-  max = 1000;
   for (int i; i < (img->height); i++) {
     for (int j; j < (img->width); j++) {
       int currentpixel = ImageGetPixel(img, j, i);
@@ -423,8 +420,20 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
+  int brighpixel;
   // Insert your code here!
+  // nao pode ser mais de 255
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      int currentpixel = ImageGetPixel(img, j, i);
+      brighpixel = factor*currentpixel; 
+      if (brighpixel > 255) {
+        brighpixel = 255;
+      }
+      ImageSetPixel(img, j, i, brighpixel);
+    }
+  }
 }
 
 
