@@ -475,7 +475,6 @@ Image ImageRotate(Image img) { ///
   Image nimage = ImageCreate(nimage_height, nimage_width, nimage_maxval);
   for (int i=0;i<nimage_height;i++){
     for (int j=0;j<nimage_width;j++){
-      // the rotation is only 90 degrees anti-clockwise
       ImageSetPixel(nimage, i, j, ImageGetPixel(img, nimage_width -1 - j , i));
     }
   }
@@ -492,6 +491,17 @@ Image ImageRotate(Image img) { ///
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  int nimage_width = img->width;
+  int nimage_height= img->height;
+  int nimage_maxval = img->maxval;
+  Image nimage = ImageCreate(nimage_width, nimage_height, nimage_maxval);
+  for (int i=0;i<nimage_height;i++){
+    for (int j=0;j<nimage_width;j++){
+      ImageSetPixel(nimage, i, j, ImageGetPixel(img, j, i));
+    }
+  }
+  return nimage;
+  
 }
 
 /// Crop a rectangular subimage from img.
@@ -510,6 +520,13 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+  int nmaxval = img->maxval;
+  Image nimage = ImageCreate(w, h, nmaxval);
+  for (int i=0;i<h;i++) {
+    for (int j=0;j<w;j++) {
+      ImageSetPixel(nimage, i, j, ImageGetPixel(img, i, j));
+    }
+  }
 }
 
 
