@@ -338,6 +338,7 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+  return (0 <= x && x + w <= img->width) && (0 <= y && y + h <= img->height);
 }
 
 /// Pixel get & set operations
@@ -393,8 +394,8 @@ void ImageNegative(Image img) { ///
   uint8 invlevel;
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
-      int currentpixel = ImageGetPixel(img, j, i);
-      invlevel = (int)((255 - currentpixel)+0.5);
+      uint8 currentpixel = ImageGetPixel(img, j, i);
+      invlevel = (uint8)((255 - currentpixel)+0.5);
       ImageSetPixel(img, j, i, invlevel);
     }
   }
@@ -409,7 +410,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   uint8 thrlevel;
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
-      int currentpixel = ImageGetPixel(img, j, i);
+      uint8 currentpixel = ImageGetPixel(img, j, i);
       if (currentpixel<thr){
         thrlevel=0;
       }
@@ -428,13 +429,13 @@ void ImageThreshold(Image img, uint8 thr) { ///
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
-  int brighpixel;
+  uint8 brighpixel;
   // Insert your code here!
   // nao pode ser mais de 255
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
-      int currentpixel = ImageGetPixel(img, j, i);
-      brighpixel = factor*currentpixel; 
+      uint8 currentpixel = ImageGetPixel(img, j, i);
+      brighpixel = (uint8)((factor*currentpixel)+0.5); 
       if (brighpixel > 255) {
         brighpixel = 255;
       }
@@ -468,6 +469,17 @@ void ImageBrighten(Image img, double factor) { ///
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  int nimage_height = img->width;
+  int nimage_width = img->height;
+  int nimage_maxval = img->maxval;
+  Image nimage = ImageCreate(nimage_height, nimage_width, nimage_maxval);
+  for (int i=0;i<nimage_height;i++){
+    for (int j=0;j<nimage_width;j++){
+      // the rotation is only 90 degrees anti-clockwise
+      ImageSetPixel(nimage, i, j, ImageGetPixel(img, nimage_width -1 - j , i));
+    }
+  }
+  return nimage;
 }
 
 /// Mirror an image = flip left-right.
