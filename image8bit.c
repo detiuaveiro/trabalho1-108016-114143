@@ -542,8 +542,15 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
-  
+  for (int i = 0; i < img2->height; i++) {
+    for (int j = 0; j < img2->width; j++) {
+      if ((i+y) < img1->height && (j+x) < img1->width) {
+        ImageSetPixel(img1, j+x, i+y, ImageGetPixel(img2, j, i));
+      }
+    }
+  }
 }
+
 
 /// Blend an image into a larger image.
 /// Blend img2 into position (x, y) of img1.
@@ -556,6 +563,20 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  for (int i = 0; i < img2->height; i++) {
+    for (int j = 0; j < img2->width; j++) {
+      if ((i+y) < img1->height && (j+x) < img1->width) {
+        uint8 pixel1 = ImageGetPixel(img1, j+x, i+y);
+        uint8 pixel2 = ImageGetPixel(img2, j, i);
+        uint8 newpixel = (uint8)((pixel1 + pixel2)*alpha);
+        if (newpixel > 255) {
+          newpixel = 255;
+        }
+        ImageSetPixel(img1, j+x, i+y, newpixel);
+      }
+    }
+  }
+  return img1;
 }
 
 /// Compare an image to a subimage of a larger image.
