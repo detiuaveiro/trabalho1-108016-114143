@@ -473,9 +473,13 @@ Image ImageRotate(Image img) { ///
   int nimage_width = img->height;
   int nimage_maxval = img->maxval;
   Image nimage = ImageCreate(nimage_height, nimage_width, nimage_maxval);
+  if (nimage == NULL) {
+    errCause = "Falha ao gerar nova imagem";
+    return NULL;
+  }
   for (int i=0;i<nimage_height;i++){
     for (int j=0;j<nimage_width;j++){
-      ImageSetPixel(nimage, j, i, ImageGetPixel(img, nimage_width -1 - j , i));
+      ImageSetPixel(nimage, i, j, ImageGetPixel(img, nimage_width -1 - j , i));
     }
   }
   return nimage;
@@ -495,6 +499,10 @@ Image ImageMirror(Image img) { ///
   int nimage_height= img->height;
   int nimage_maxval = img->maxval;
   Image nimage = ImageCreate(nimage_width, nimage_height, nimage_maxval);
+  if (nimage == NULL) {
+    errCause = "Falha ao gerar nova imagem";
+    return NULL;
+  }
   for (int i=0;i<(img->height);i++){
     for (int j=0;j<(img->width);j++){
       ImageSetPixel(nimage, j, i, ImageGetPixel(img, nimage_width-j-1 , i));  /// -1 porque para altura de 4, temos 0,1,2,3
@@ -522,6 +530,10 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   // Insert your code here!
   int nmaxval = img->maxval;
   Image nimage = ImageCreate(w, h, nmaxval);
+  if (nimage == NULL) {
+    errCause = "Falha ao gerar nova imagem";
+    return NULL;
+  }
   for (int i = 0; i < h; i++) {
     for (int j = 0; j < w; j++) {
       ImageSetPixel(nimage, j, i, ImageGetPixel(img, x + j, y + i));
@@ -568,15 +580,17 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       if ((i+y) < img1->height && (j+x) < img1->width) {
         uint8 pixel1 = ImageGetPixel(img1, j+x, i+y);
         uint8 pixel2 = ImageGetPixel(img2, j, i);
-        uint8 newpixel = (uint8)((pixel1 + pixel2)*alpha);
+        uint8 newpixel = (uint8)(((pixel2*alpha)+pixel1));
         if (newpixel > 255) {
           newpixel = 255;
+        }
+        if (newpixel < 0){
+          newpixel = 0;
         }
         ImageSetPixel(img1, j+x, i+y, newpixel);
       }
     }
   }
-  return img1;
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -587,6 +601,16 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   // Insert your code here!
+  if (!ImageValidRect(img1,x,y,img2->width,img2->height)){
+    return 0;
+  }
+  for(int i=0; i<img2->height; i++){
+    for(int j=0; j<img2->width; j++){
+      if (ImageGetPixel(img1,j+x,i+y)!=ImageGetPixel(img2,j,i)){
+        return 0;
+      }
+    }
+  }
 }
 
 /// Locate a subimage inside another image.
@@ -597,6 +621,20 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Insert your code here!
+  for(int i=0; i<img1->height-img2->height; i++){
+    for(int j=0; j<img1->width-img2->width; j++){
+      if(ImageMatchSubImage(img1,j,i,img2)) {
+        if(px != NULL){
+          *px = j;
+        }
+        if(py != NULL){
+          *py = i;
+        }
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 
