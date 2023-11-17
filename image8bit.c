@@ -475,7 +475,7 @@ Image ImageRotate(Image img) { ///
   Image nimage = ImageCreate(nimage_height, nimage_width, nimage_maxval);
   for (int i=0;i<nimage_height;i++){
     for (int j=0;j<nimage_width;j++){
-      ImageSetPixel(nimage, i, j, ImageGetPixel(img, nimage_width -1 - j , i));
+      ImageSetPixel(nimage, j, i, ImageGetPixel(img, nimage_width -1 - j , i));
     }
   }
   return nimage;
@@ -495,9 +495,9 @@ Image ImageMirror(Image img) { ///
   int nimage_height= img->height;
   int nimage_maxval = img->maxval;
   Image nimage = ImageCreate(nimage_width, nimage_height, nimage_maxval);
-  for (int i=0;i<nimage_height;i++){
-    for (int j=0;j<nimage_width;j++){
-      ImageSetPixel(nimage, i, j, ImageGetPixel(img, j, i));
+  for (int i=0;i<(img->height);i++){
+    for (int j=0;j<(img->width);j++){
+      ImageSetPixel(nimage, j, i, ImageGetPixel(img, nimage_width-j-1 , i));  /// -1 porque para altura de 4, temos 0,1,2,3
     }
   }
   return nimage;
@@ -522,11 +522,12 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   // Insert your code here!
   int nmaxval = img->maxval;
   Image nimage = ImageCreate(w, h, nmaxval);
-  for (int i=0;i<h;i++) {
-    for (int j=0;j<w;j++) {
-      ImageSetPixel(nimage, i, j, ImageGetPixel(img, i, j));
+  for (int i = 0; i < h; i++) {
+    for (int j = 0; j < w; j++) {
+      ImageSetPixel(nimage, j, i, ImageGetPixel(img, x + j, y + i));
     }
   }
+  return nimage;
 }
 
 
@@ -541,6 +542,7 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  
 }
 
 /// Blend an image into a larger image.
