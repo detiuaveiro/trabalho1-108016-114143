@@ -580,7 +580,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       if ((i+y) < img1->height && (j+x) < img1->width) {
         uint8 pixel1 = ImageGetPixel(img1, j+x, i+y);
         uint8 pixel2 = ImageGetPixel(img2, j, i);
-        uint8 newpixel = (uint8)(((pixel2*alpha)+pixel1));
+        uint8 newpixel = (uint8)(((1.0 - alpha) * pixel1 + alpha * pixel2)+0.5);
         if (newpixel > 255) {
           newpixel = 255;
         }
@@ -596,7 +596,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
-int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
+int ImageMatchSubImage(Image img1, int x, int y, Image img2) { 
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
