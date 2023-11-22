@@ -611,6 +611,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
       }
     }
   }
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -647,25 +648,34 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
+  Image blur = ImageCreate(img->width, img->height,img->maxval);
   for(int i=0; i<img->height; i++){
     for(int j=0; j<img->width; j++){
-      int soma, count, media;
-
-      for (int y=(j-dx); y<(j+dx+1); y++) {
-        for (int x=(i-dy); x<(i+dy+1); x++) {
+      double soma=0;
+      double count=0;
+      double media=0;
+ 
+      for (int x=(j-dx); x<=(j+dx); x++) {
+        for (int y=(i-dy); y<=(i+dy); y++) {
           if (ImageValidPos(img,x,y)) {
             count++;
-            soma = ImageGetPixel(img,x,y);
+            soma += ImageGetPixel(img,x,y);
           }
         }
       }
       if (count != 0) {
-        media = soma/count;
+        media = (soma/count)+0.5;
       } else {
         media = 0;
       }
-      ImageSetPixel(img,j,i,media);
+      ImageSetPixel(blur,j,i,(uint8)media);
     }
   }
+  for(int i=0; i<blur->height; i++){
+    for(int j=0; j<blur->width; j++){
+      ImageSetPixel(img,j,i,ImageGetPixel(blur,j,i)); 
+    }
+  }
+  ImageDestroy(&blur);
 }
 
