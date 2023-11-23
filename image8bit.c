@@ -587,7 +587,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       if ((i+y) < img1->height && (j+x) < img1->width) {   // verificamos se as coordenadas da img1 e da img2 somadas estão dentro dos limites
         uint8 pixel1 = ImageGetPixel(img1, j+x, i+y);   // j+x e i+y pois estamos a selecionar o pixel da img1 correspondente ao da img2
         uint8 pixel2 = ImageGetPixel(img2, j, i);  // vamos buscar o pixel na img2
-        uint8 newpixel = (uint8)(((1.0 - alpha) * pixel1 + alpha * pixel2)+0.5);   
+        uint8 newpixel = (uint8)(((1.0 - alpha) * pixel1 + alpha * pixel2)+0.5);   // Se alpha for 0.0, o resultado será idêntico a pixel1, se alpha for 1.0, o resultado será idêntico a pixel2, e para valores intermediários de alpha, o resultado será uma combinação ponderada dos dois pixels.
         if (newpixel > 255) {   // overflow aturate
           newpixel = 255;
         } else if (newpixel < 0){   // underflow
