@@ -599,6 +599,9 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   }
 }
 
+
+
+
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
@@ -612,6 +615,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   }
   for(int i=0; i<img2->height; i++){  // percorremos a imagem
     for(int j=0; j<img2->width; j++){
+      InstrCount[0] += 3;  // to count array acesses
+      InstrCount[1] += 1;  // to count addition
       if (ImageGetPixel(img1,j+x,i+y)!=ImageGetPixel(img2,j,i)){   // se as imagens não coincidirem, j+x e i+y pois temos de ter em consideração a posição da img2 em relação à img1
         return 0;
       }
@@ -627,6 +632,10 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
+  void InstrCalibrate();
+  void InstrReset();
+  InstrName[0]="estupido";
+  InstrName[1]= "burro";
   // Insert your code here!
   for(int i=0; i<img1->height-img2->height; i++){    // percorremos a imagem
     for(int j=0; j<img1->width-img2->width; j++){
@@ -637,6 +646,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
         if(py != NULL){
           *py = i;   // *py toma a posição da coordenada y
         }
+        InstrPrint();  // to show time and counters
         return 1;   
       }
     }
