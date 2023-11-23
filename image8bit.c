@@ -611,6 +611,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
       }
     }
   }
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -649,18 +650,20 @@ void ImageBlur(Image img, int dx, int dy) { ///
   assert(img != NULL);
   for(int i=0; i<img->height; i++){
     for(int j=0; j<img->width; j++){
-      int soma, count, media;
+      int soma=0; 
+      int count = 0;
+      int media = 0;
 
-      for (int y=(j-dx); y<(j+dx+1); y++) {
-        for (int x=(i-dy); x<(i+dy+1); x++) {
+      for (int x=(j-dx); x<(j+dx+1); x++) {
+        for (int y=(i-dy); y<(i+dy+1); y++) {
           if (ImageValidPos(img,x,y)) {
             count++;
-            soma = ImageGetPixel(img,x,y);
+            soma += ImageGetPixel(img,x,y);
           }
         }
       }
       if (count != 0) {
-        media = soma/count;
+        media = (soma/count)+0.5;
       } else {
         media = 0;
       }
