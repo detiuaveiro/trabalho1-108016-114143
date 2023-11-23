@@ -76,6 +76,29 @@ test9: $(PROGS) setup
 test10: $(PROGS) setup
 	./imageTool test/chess8.pgm blur 1,1 save blur2.pgm
 
+test11: $(PROGS) setup
+	./imageTool test/original.pgm blur 2,2 save blur3.pgm
+
+
+test12: $(PROGS) setup
+	./imageTool test/original.pgm blur 0,0 save blur4.pgm
+
+test13: $(PROGS) setup
+	./imageTool test/original.pgm blur 0,1 save blur5.pgm
+
+test14: $(PROGS) setup
+	./imageTool test/original.pgm blur 1,0 save blur6.pgm
+
+test15: $(PROGS) setup
+	./imageTool test/original.pgm blur 1,1 save blur7.pgm
+
+test16: $(PROGS) setup
+	./imageTool test/original.pgm blur 2,2 save blur8.pgm
+
+
+
+
+
 
 .PHONY: tests
 tests: $(TESTS)
