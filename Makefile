@@ -93,7 +93,10 @@ test15: $(PROGS) setup
 	./imageTool test/original.pgm blur 1,1 save blur7.pgm
 
 test16: $(PROGS) setup
-	./imageTool test/original.pgm blur 2,2 save blur8.pgm
+	./imageTool test/original.pgm blur 0,8 save blur8.pgm
+
+
+
 
 
 
