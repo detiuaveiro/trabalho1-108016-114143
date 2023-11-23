@@ -76,6 +76,39 @@ test9: $(PROGS) setup
 test10: $(PROGS) setup
 	./imageTool test/chess8.pgm blur 1,1 save blur2.pgm
 
+test11: $(PROGS) setup
+	./imageTool test/original.pgm blur 2,2 save blur3.pgm
+
+test12: $(PROGS) setup
+	./imageTool test/original.pgm blur 0,0 save blur4.pgm
+
+test13: $(PROGS) setup
+	./imageTool test/original.pgm blur 0,1 save blur5.pgm
+
+test14: $(PROGS) setup
+	./imageTool test/original.pgm blur 1,0 save blur6.pgm
+
+test15: $(PROGS) setup
+	./imageTool test/original.pgm blur 1,1 save blur7.pgm
+
+test16: $(PROGS) setup
+	./imageTool test/original.pgm blur 2,2 save blur8.pgm
+
+test20: $(PROGS) setup
+	./imageTool test/crop.pgm test/original.pgm locate
+test21:
+	./imageTool test/small.pgm test/paste.pgm locate
+test22:
+	./imageTool pgm/small/art3_222x217.pgm crop 100,100,100,100 save small2.pgm
+	./imageTool small2.pgm pgm/small/art3_222x217.pgm locate
+test23:
+	./imageTool pgm/large/ireland-06-1200x1600.pgm crop 0,0,1000,1500 save small3.pgm
+	./imageTool small3.pgm pgm/large/ireland-06-1200x1600.pgm locate
+	
+
+
+
+
 .PHONY: tests
 tests: $(TESTS)
 
