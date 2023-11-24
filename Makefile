@@ -76,23 +76,27 @@ test9: $(PROGS) setup
 test10: $(PROGS) setup
 	./imageTool test/chess8.pgm blur 1,1 save blur2.pgm
 
+
 test11: $(PROGS) setup
-	./imageTool test/original.pgm blur 2,2 save blur3.pgm
+	./imageTool pgm/medium/ireland-03_640x480.pgm blur 8,8 save blur3.pgm
 
 test12: $(PROGS) setup
-	./imageTool test/original.pgm blur 0,0 save blur4.pgm
+	./imageTool pgm/large/ireland_03_1600x1200.pgm blur 8,8 save blur4.pgm
 
 test13: $(PROGS) setup
-	./imageTool test/original.pgm blur 0,1 save blur5.pgm
+	./imageTool pgm/small/art3_222x217.pgm blur 0,4 save blur5.pgm
 
 test14: $(PROGS) setup
-	./imageTool test/original.pgm blur 1,0 save blur6.pgm
+	./imageTool pgm/small/art3_222x217.pgm blur 4,0 save blur6.pgm
 
 test15: $(PROGS) setup
-	./imageTool test/original.pgm blur 1,1 save blur7.pgm
+	./imageTool pgm/small/bird_256x256.pgm blur 5,2 save blur7.pgm
 
 test16: $(PROGS) setup
-	./imageTool test/original.pgm blur 2,2 save blur8.pgm
+	./imageTool pgm/large/airfield-05_1600x1200.pgm blur 15,15 save blur8.pgm
+
+
+
 
 test20: $(PROGS) setup
 	./imageTool test/crop.pgm test/original.pgm locate
