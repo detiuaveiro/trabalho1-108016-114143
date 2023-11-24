@@ -615,15 +615,15 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   }
   for(int i=0; i<img2->height; i++){  // percorremos a imagem
     for(int j=0; j<img2->width; j++){
-      InstrCount[0] += 3;  // to count array acesses
-      InstrCount[1] += 1;  // to count addition
       if (ImageGetPixel(img1,j+x,i+y)!=ImageGetPixel(img2,j,i)){   // se as imagens não coincidirem, j+x e i+y pois temos de ter em consideração a posição da img2 em relação à img1
         return 0;
       }
     }
   }
+  InstrCount[0] += 1;  // to count addition
   return 1;   // se coincidirem retorna 1
 }
+
 
 /// Locate a subimage inside another image.
 /// Searches for img2 inside img1.
@@ -634,8 +634,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img2 != NULL);
   void InstrCalibrate();
   void InstrReset();
-  InstrName[0]="estupido";
-  InstrName[1]= "burro";
+  InstrName[0]="ncomp";
   // Insert your code here!
   for(int i=0; i<img1->height-img2->height; i++){    // percorremos a imagem
     for(int j=0; j<img1->width-img2->width; j++){
@@ -651,6 +650,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
       }
     }
   }
+  InstrPrint();
   return 0;
 }
 
