@@ -665,6 +665,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
+  assert(dx >= 0 && dy >= 0);
   Image imgToBlur = ImageCreate(img->width, img->height,img->maxval);   // criamos uma imagem temporaria
   for(int i=0; i<img->height; i++){   // percorremos a imagem original
     for(int j=0; j<img->width; j++){
@@ -697,7 +698,46 @@ void ImageBlur(Image img, int dx, int dy) { ///
   ImageDestroy(&imgToBlur);  // destruimos a imagem temporaria
 }
 
+/*
+void ImageBlur1(Image img, int dx, int dy) { ///
+  // Insert your code here!
+  assert(img != NULL);
+  int arrayindex=0;
+  double (*arraypixels)[3] = malloc(img->height * img->width * sizeof(double[3]));
+  for(int i=0; i<img->height; i++){   // percorremos a imagem original
+    for(int j=0; j<img->width; j++){
+      double soma=0;
+      double count=0;
+      double media=0;
+ 
+      for (int x=(j-dx); x<=(j+dx); x++) {   // percorremos o retangulo dentro da "área afetada pelo blur"
+        for (int y=(i-dy); y<=(i+dy); y++) {
+          if (ImageValidPos(img,x,y)) {   // se a posição for valida:
+            count++;                      // +1 para o count pois temos +1 pixel
+            soma += ImageGetPixel(img,x,y);  // e na soma somamos o valor do pixel
+          }
+        }
+      }
+      if (count != 0) {   // se count for diferente de 0, calculamos a média
+        media = (soma/count)+0.5;   // com 0.5 para o arredondamento às unidades
+      } else {
+        media = 0;  // caso seja 0 a média também é 0
+      }
+      // não podemos alterar a imagem original pois isso ia alterar os valores dos pixeis na altura de percorrer o retangulo da "área afetada pelo blur"
+      
+      arraypixels[arrayindex][0] = j;  // x
+      arraypixels[arrayindex][1] = i;  // y
+      arraypixels[arrayindex][2] = media;  // media 
+      arrayindex++;
+    }
+  }
+  for(int i=0; i<img->height; i++){   
+    for(int j=0; j<img->width; j++){
+      double blurValue = arraypixels[i * img->width + j][2];
+      ImageSetPixel(img, j, i, blurValue);  
+    }
+  }
+  free(arraypixels);
+}
 
-
-
-
+*/
