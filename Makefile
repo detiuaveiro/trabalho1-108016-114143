@@ -99,11 +99,20 @@ test20: $(PROGS) setup
 test21:
 	./imageTool test/small.pgm test/paste.pgm locate
 test22:
-	./imageTool pgm/small/art3_222x217.pgm crop 100,100,100,100 save small2.pgm
-	./imageTool small2.pgm pgm/small/art3_222x217.pgm locate
+	./imageTool pgm/small/bird_256x256.pgm crop 0,0,1,1 save small2.pgm
+	./imageTool small2.pgm pgm/small/bird_256x256.pgm locate
 test23:
-	./imageTool pgm/large/ireland-06-1200x1600.pgm crop 0,0,1000,1500 save small3.pgm
+	./imageTool pgm/small/bird_256x256.pgm crop 30,180,7,5 save small2.pgm
+	./imageTool small2.pgm pgm/small/bird_256x256.pgm locate
+test24:
+	./imageTool pgm/large/ireland-06-1200x1600.pgm crop 0,0,3,3 save small3.pgm
 	./imageTool small3.pgm pgm/large/ireland-06-1200x1600.pgm locate
+test25:
+	./imageTool pgm/large/ireland-06-1200x1600.pgm crop 570,890,100,300 save small3.pgm
+	./imageTool small3.pgm pgm/large/ireland-06-1200x1600.pgm locate
+test26:
+	./imageTool test/chess8.pgm crop 0,0,1,1 save small4.pgm
+	./imageTool small4.pgm test/chess8.pgm locate
 	
 
 
