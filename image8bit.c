@@ -666,6 +666,12 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
+
+  void InstrCalibrate(); 
+  void InstrReset(); 
+  InstrName[0] = "memops";
+  InstrName[1] = "comp";
+  
   Image imgToBlur = ImageCreate(img->width, img->height,img->maxval);   // criamos uma imagem temporaria
   for(int i=0; i<img->height; i++){   // percorremos a imagem original
     for(int j=0; j<img->width; j++){
@@ -678,24 +684,32 @@ void ImageBlur(Image img, int dx, int dy) { ///
           if (ImageValidPos(img,x,y)) {   // se a posição for valida:
             count++;                      // +1 para o count pois temos +1 pixel
             soma += ImageGetPixel(img,x,y);  // e na soma somamos o valor do pixel
+            InstrName[0] += 1;
           }
+          InstrName[1] += 1;
         }
       }
       if (count != 0) {   // se count for diferente de 0, calculamos a média
         media = (soma/count)+0.5;   // com 0.5 para o arredondamento às unidades
+        InstrName[1] += 1;
       } else {
         media = 0;  // caso seja 0 a média também é 0
+        InstrName[1] += 1;
       }
       // não podemos alterar a imagem original pois isso ia alterar os valores dos pixeis na altura de percorrer o retangulo da "área afetada pelo blur"
       ImageSetPixel(imgToBlur,j,i,(uint8)media);   // definimos o pixel com o valor da média, na imagem temporaria
+      InstrName[0] += 1;
     }
   }
   for(int i=0; i<imgToBlur->height; i++){   // percorremos a imagem temporaria
     for(int j=0; j<imgToBlur->width; j++){
       ImageSetPixel(img,j,i,ImageGetPixel(imgToBlur,j,i));   // mudamos os valores na imagem original
+      InstrName[0] += 2;
     }
   }
   ImageDestroy(&imgToBlur);  // destruimos a imagem temporaria
+  InstrName[0] += 1;
+  InstrPrint(); 
 }
 
 /*
