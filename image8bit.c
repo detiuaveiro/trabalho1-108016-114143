@@ -148,7 +148,6 @@ void ImageInit(void) { ///
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
   InstrName[1] = "ncomp";
   // Name other counters here...
-  InstrName[1] = "comp";  // comparações
   InstrName[2] = "atrib";  // atribuições
 }
 
@@ -626,8 +625,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   }
   for(int i=0; i<img2->height; i++){  // percorremos a imagem
     for(int j=0; j<img2->width; j++){
-      InstrCount[0] +=3;              //acessos a memória
-      InstrCount[1] +=1;              //numero de comparações
+      ATRIB +=3;              
+      COMP +=1;              //numero de comparações
       if (ImageGetPixel(img1,j+x,i+y)!=ImageGetPixel(img2,j,i)){   // se as imagens não coincidirem, j+x e i+y pois temos de ter em consideração a posição da img2 em relação à img1
         return 0;
       }
@@ -655,10 +654,12 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
         if(py != NULL){
           *py = i;   // *py toma a posição da coordenada y
         }
+        InstrPrint();
         return 1;   
       }
     }
   }
+  InstrPrint();
   return 0;
 }
 
