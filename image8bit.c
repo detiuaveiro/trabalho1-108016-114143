@@ -146,6 +146,7 @@ static int check(int condition, const char* failmsg) {
 void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
+  InstrName[1] = "ncomp";
   // Name other counters here...
   
 }
@@ -615,12 +616,13 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   }
   for(int i=0; i<img2->height; i++){  // percorremos a imagem
     for(int j=0; j<img2->width; j++){
+      InstrCount[0] +=3;              //acessos a memória
+      InstrCount[1] +=1;              //numero de comparações
       if (ImageGetPixel(img1,j+x,i+y)!=ImageGetPixel(img2,j,i)){   // se as imagens não coincidirem, j+x e i+y pois temos de ter em consideração a posição da img2 em relação à img1
         return 0;
       }
     }
   }
-  InstrCount[0] += 1;  // to count addition
   return 1;   // se coincidirem retorna 1
 }
 
@@ -632,9 +634,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
-  void InstrCalibrate();
   void InstrReset();
-  InstrName[0]="ncomp";
   // Insert your code here!
   for(int i=0; i<img1->height-img2->height; i++){    // percorremos a imagem
     for(int j=0; j<img1->width-img2->width; j++){
