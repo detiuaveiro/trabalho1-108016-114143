@@ -149,6 +149,7 @@ void ImageInit(void) { ///
   InstrName[1] = "ncomp";
   // Name other counters here...
   InstrName[2] = "atrib";  // atribuições
+  InstrName[3] = "allocmem";  // memória alocada
 }
 
 // Macros to simplify accessing instrumentation counters:
@@ -156,6 +157,7 @@ void ImageInit(void) { ///
 // Add more macros here...
 #define COMP InstrCount[1]
 #define ATRIB InstrCount[2]
+#define ALLOCMEM InstrCount[3] 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
 
@@ -175,21 +177,26 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
   Image newImage = (Image)malloc(sizeof(*newImage));    // criamos nova imagem, malloc aloca um bloco de memória
+  ALLOCMEM += sizeof(*newImage);
+  ATRIB += 1;
   if (newImage == NULL) {   // verificamos se ouve alguma falha ao criar a imagem
     errCause = "Falha ao alocar memória";
     return NULL;
   }
+  COMP += 1;  // comparação na linha 179
 
   newImage->width = width;
   newImage->height = height;
   newImage->maxval = maxval;
   newImage->pixel = (uint8_t*)calloc(width * height, sizeof(uint8_t));  // estamos a alucar memória para o campo do pixel do objeto newImage.
-                                                                        // calloc é usada para alocar memória para uma matriz de uint8_t com tamanho de largura * altura, e inicia-os a 0;
+  ALLOCMEM += width * height * sizeof(uint8_t);                          // calloc é usada para alocar memória para uma matriz de uint8_t com tamanho de largura * altura, e inicia-os a 0;
+  ATRIB += 4;   // 4 atribuições anteriores
   if (newImage->pixel == NULL) {  // verificamos se ocorreu algum erro a alocar
     errCause = "Falha ao alocar memória";
     free(newImage);  // usamos free() para desalocar o espaço previamente criado, visto que ocorreu um erro no pixel
     return NULL;
   }
+  COMP += 1;  // comparação na linha 191
   return newImage;
   
 }
@@ -205,9 +212,11 @@ void ImageDestroy(Image* imgp) { ///
   if ((*imgp) == NULL) {
     return;
   }
+  COMP += 1;
   free((*imgp)->pixel);   // Desalocamos o espaço na memória do pixel
   free(*imgp);  // Desalocamos o espaço na memória da imagem
   *imgp = NULL;   // "Apagamos" a imagem
+  ATRIB += 1;
 }
 
 
@@ -378,6 +387,7 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   assert (ImageValidPos(img, x, y));
   PIXMEM += 1;  // count one pixel access (store)
   img->pixel[G(img, x, y)] = level;
+  ATRIB += 1;
 } 
 
 
@@ -692,6 +702,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
             count++;                      // +1 para o count pois temos +1 pixel
             soma += ImageGetPixel(img,x,y);  // e na soma somamos o valor do pixel
             COMP += 1; // comparação na linha 680
+            ATRIB += 1;
           }
         }
       }
@@ -699,7 +710,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
       if (count != 0) {   // se count for diferente de 0, calculamos a média
         media = (soma/count)+0.5;   // com 0.5 para o arredondamento às unidades
-        ATRIB += 3; // duas atribuições e uma soma
+        ATRIB += 2; // duas atribuições e uma soma
         COMP += 1; // comparação na linha 688
       } else {
         media = 0;  // caso seja 0 a média também é 0
@@ -724,11 +735,16 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
 /*
 ///// ALTERNATIVE FUNCTION TO BLUR /////
-void ImageBlur1(Image img, int dx, int dy) { ///
+void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
+  InstrReset();
+
   int arrayindex=0;
   double (*arraypixels)[3] = malloc(img->height * img->width * sizeof(double[3]));
+  ALLOCMEM += img->height * img->width * sizeof(double[3]);   // espaço alocado
+  ATRIB += 1;  // atribuição ao array
+
   for(int i=0; i<img->height; i++){   // percorremos a imagem original
     for(int j=0; j<img->width; j++){
       double soma=0;
@@ -740,13 +756,20 @@ void ImageBlur1(Image img, int dx, int dy) { ///
           if (ImageValidPos(img,x,y)) {   // se a posição for valida:
             count++;                      // +1 para o count pois temos +1 pixel
             soma += ImageGetPixel(img,x,y);  // e na soma somamos o valor do pixel
+            COMP += 1; // comparação na linha 754
+            ATRIB += 1;
           }
         }
       }
+      ATRIB += (2*dx + 1) * (2*dy + 1);  // atribuições ao x e y
+
       if (count != 0) {   // se count for diferente de 0, calculamos a média
         media = (soma/count)+0.5;   // com 0.5 para o arredondamento às unidades
+        ATRIB += 2; // duas atribuições e uma soma
+        COMP += 1; // comparação na linha 688
       } else {
         media = 0;  // caso seja 0 a média também é 0
+        ATRIB += 1; // atribuição, media = 0
       }
       // não podemos alterar a imagem original pois isso ia alterar os valores dos pixeis na altura de percorrer o retangulo da "área afetada pelo blur"
       
@@ -754,15 +777,20 @@ void ImageBlur1(Image img, int dx, int dy) { ///
       arraypixels[arrayindex][1] = i;  // y
       arraypixels[arrayindex][2] = media;  // media 
       arrayindex++;
+      ATRIB += 4;
     }
   }
+  ATRIB += img->height * img->width; // atribuições no loop principal
   for(int i=0; i<img->height; i++){   
     for(int j=0; j<img->width; j++){
       double blurValue = arraypixels[i * img->width + j][2];
+      ATRIB += 1;
       ImageSetPixel(img, j, i, blurValue);  
     }
   }
+  ATRIB += img->height * img->width;
   free(arraypixels);
+  InstrPrint();
 }
-
 */
+
