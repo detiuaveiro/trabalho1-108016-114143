@@ -148,13 +148,15 @@ void ImageInit(void) { ///
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
   InstrName[1] = "ncomp";
   // Name other counters here...
-  
+  InstrName[1] = "comp";  // comparações
+  InstrName[2] = "atrib";  // atribuições
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
 // Add more macros here...
-
+#define COMP InstrCount[1]
+#define ATRIB InstrCount[2]
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
 
@@ -201,10 +203,12 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
+  if ((*imgp) == NULL) {
+    return;
+  }
   free((*imgp)->pixel);   // Desalocamos o espaço na memória do pixel
   free(*imgp);  // Desalocamos o espaço na memória da imagem
-  imgp = NULL;   // "Apagamos" a imagem
-  
+  *imgp = NULL;   // "Apagamos" a imagem
 }
 
 
@@ -473,10 +477,7 @@ Image ImageRotate(Image img) { ///
   int nimage_width = img->height;
   int nimage_maxval = img->maxval;
   Image nimage = ImageCreate(nimage_height, nimage_width, nimage_maxval);  // criamos uma nova imagem com os mesmos dados da outra
-  if (nimage == NULL) {
-    errCause = "Falha ao gerar nova imagem";    // caso o processo de criação da imagem não tenha corrido bem
-    return NULL;
-  }
+
   for (int y=0;y<nimage_height;y++){    // percorremos a nova imagem  
     for (int x=0;x<nimage_width;x++){
       // para ocorrer rotação, definimos os pixeis da nova imagem ao contrário, ou seja y,x em vez de x,y
@@ -486,6 +487,11 @@ Image ImageRotate(Image img) { ///
       // na coordenada y damos o valor original pois se a rotação é -90º, a coordenada é a mesma
       ImageSetPixel(nimage, y, x, ImageGetPixel(img, nimage_width -1 - x , y));                                   
     }
+  }
+  if (nimage == NULL) {
+    errCause = "Falha ao alterar a imagem nova";    // caso o processo de criação da imagem não tenha corrido bem
+    errno = EIO;   // Ocorreu um problema no output
+    return NULL;
   }
   return nimage;
 }
@@ -504,15 +510,17 @@ Image ImageMirror(Image img) { ///
   int nimage_height= img->height;
   int nimage_maxval = img->maxval;
   Image nimage = ImageCreate(nimage_width, nimage_height, nimage_maxval);
-  if (nimage == NULL) {
-    errCause = "Falha ao gerar nova imagem";
-    return NULL;
-  }
+
   for (int y=0;y<(img->height);y++){   // percorremos a imagem
     for (int x=0;x<(img->width);x++){
       // nos argumentos da ImageGetPixel metemos nimage_width-x-1 para espelhar a imagem horizontalmente
       ImageSetPixel(nimage, x, y, ImageGetPixel(img, nimage_width-x-1 , y));  /// -1 porque para altura de 4, temos 0,1,2,3
     }
+  }
+  if (nimage == NULL) {
+    errCause = "Falha ao alterar a imagem nova";    // caso o processo de criação da imagem não tenha corrido bem
+    errno = EIO;   // Ocorreu um problema no output
+    return NULL;
   }
   return nimage;
   
@@ -536,15 +544,17 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   // Insert your code here!
   int nmaxval = img->maxval;
   Image nimage = ImageCreate(w, h, nmaxval);   // criamos uma nova imagem, que vai ser a imagem cortada
-  if (nimage == NULL) {
-    errCause = "Falha ao gerar nova imagem";
-    return NULL;
-  }
+
   for (int i = 0; i < h; i++) {  // percorremos a imagem
     for (int j = 0; j < w; j++) {
       // as coordenadas x e y para a ImagegetPixel são x+j e y+i pois temos de adicionar a coordenada top-left do retangulo
       ImageSetPixel(nimage, j, i, ImageGetPixel(img, x + j, y + i));
     }
+  }
+  if (nimage == NULL) {
+    errCause = "Falha ao alterar a imagem nova";    // caso o processo de criação da imagem não tenha corrido bem
+    errno = EIO;   // Ocorreu um problema no output
+    return NULL;
   }
   return nimage;
 }
@@ -645,12 +655,10 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
         if(py != NULL){
           *py = i;   // *py toma a posição da coordenada y
         }
-        InstrPrint();  // to show time and counters
         return 1;   
       }
     }
   }
-  InstrPrint();
   return 0;
 }
 
@@ -666,13 +674,11 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
-
-  void InstrCalibrate(); 
-  void InstrReset(); 
-  InstrName[0] = "memops";
-  InstrName[1] = "comp";
   
+  InstrReset();
+
   Image imgToBlur = ImageCreate(img->width, img->height,img->maxval);   // criamos uma imagem temporaria
+
   for(int i=0; i<img->height; i++){   // percorremos a imagem original
     for(int j=0; j<img->width; j++){
       double soma=0;
@@ -682,38 +688,41 @@ void ImageBlur(Image img, int dx, int dy) { ///
       for (int x=(j-dx); x<=(j+dx); x++) {   // percorremos o retangulo dentro da "área afetada pelo blur"
         for (int y=(i-dy); y<=(i+dy); y++) {
           if (ImageValidPos(img,x,y)) {   // se a posição for valida:
-            InstrName[0] += 1;  // chamada da ImageValidPos
             count++;                      // +1 para o count pois temos +1 pixel
             soma += ImageGetPixel(img,x,y);  // e na soma somamos o valor do pixel
-            InstrName[0] += 1;  // chamada da ImageGetPixel
+            COMP += 1; // comparação na linha 680
           }
-          InstrName[1] += 1;   // comparação na linha 684
         }
       }
+      ATRIB += (2*dx + 1) * (2*dy + 1);  // atribuições ao x e y
+
       if (count != 0) {   // se count for diferente de 0, calculamos a média
         media = (soma/count)+0.5;   // com 0.5 para o arredondamento às unidades
-        InstrName[1] += 1;   // comparação na linha 693
+        ATRIB += 3; // duas atribuições e uma soma
+        COMP += 1; // comparação na linha 688
       } else {
         media = 0;  // caso seja 0 a média também é 0
-        InstrName[1] += 1;   // comparação na linha 698
+        ATRIB += 1; // atribuição, media = 0
       }
       // não podemos alterar a imagem original pois isso ia alterar os valores dos pixeis na altura de percorrer o retangulo da "área afetada pelo blur"
       ImageSetPixel(imgToBlur,j,i,(uint8)media);   // definimos o pixel com o valor da média, na imagem temporaria
-      InstrName[0] += 1;   // chamada da ImageGetPixel
+      ATRIB += 1; // atribuição (uint8)media)
     }
   }
   for(int i=0; i<imgToBlur->height; i++){   // percorremos a imagem temporaria
     for(int j=0; j<imgToBlur->width; j++){
       ImageSetPixel(img,j,i,ImageGetPixel(imgToBlur,j,i));   // mudamos os valores na imagem original
-      InstrName[0] += 2;   // chamada da ImageGetPixel e ImageSetPixel
     }
   }
+  ATRIB += img->height * img->width; // atribuições no loop principal
+  ATRIB += imgToBlur->height * imgToBlur->width; // atribuições no loop ao i e j
   ImageDestroy(&imgToBlur);  // destruimos a imagem temporaria
-  InstrName[0] += 1;   // chamada da ImageDestroy
-  InstrPrint(); 
+
+  InstrPrint();
 }
 
 /*
+///// ALTERNATIVE FUNCTION TO BLUR /////
 void ImageBlur1(Image img, int dx, int dy) { ///
   // Insert your code here!
   assert(img != NULL);
