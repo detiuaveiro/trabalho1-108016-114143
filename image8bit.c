@@ -149,7 +149,6 @@ void ImageInit(void) { ///
   InstrName[1] = "ncomp";
   // Name other counters here...
   InstrName[2] = "atrib";  // atribuições
-  InstrName[3] = "allocmem";  // memória alocada
 }
 
 // Macros to simplify accessing instrumentation counters:
@@ -157,7 +156,6 @@ void ImageInit(void) { ///
 // Add more macros here...
 #define COMP InstrCount[1]
 #define ATRIB InstrCount[2]
-#define ALLOCMEM InstrCount[3] 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
 
@@ -177,7 +175,6 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
   Image newImage = (Image)malloc(sizeof(*newImage));    // criamos nova imagem, malloc aloca um bloco de memória
-  ALLOCMEM += sizeof(*newImage);
   ATRIB += 1;
   if (newImage == NULL) {   // verificamos se ouve alguma falha ao criar a imagem
     errCause = "Falha ao alocar memória";
@@ -189,7 +186,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   newImage->height = height;
   newImage->maxval = maxval;
   newImage->pixel = (uint8_t*)calloc(width * height, sizeof(uint8_t));  // estamos a alucar memória para o campo do pixel do objeto newImage.
-  ALLOCMEM += width * height * sizeof(uint8_t);                          // calloc é usada para alocar memória para uma matriz de uint8_t com tamanho de largura * altura, e inicia-os a 0;
+                                                                        // calloc é usada para alocar memória para uma matriz de uint8_t com tamanho de largura * altura, e inicia-os a 0;
   ATRIB += 4;   // 4 atribuições anteriores
   if (newImage->pixel == NULL) {  // verificamos se ocorreu algum erro a alocar
     errCause = "Falha ao alocar memória";
@@ -742,7 +739,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
   int arrayindex=0;
   double (*arraypixels)[3] = malloc(img->height * img->width * sizeof(double[3]));
-  ALLOCMEM += img->height * img->width * sizeof(double[3]);   // espaço alocado
   ATRIB += 1;  // atribuição ao array
 
   for(int i=0; i<img->height; i++){   // percorremos a imagem original
